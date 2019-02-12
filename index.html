@@ -10,13 +10,17 @@
 
 <body>
   <script>
-    function saveAs(uri, filename) {
+    function saveAs_A(uri, filename) {
       var link = document.createElement('a');
       link.href = uri;
       link.download = filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+    }
+
+    function saveAs_B(uri, filename) {
+      window.open(uri);
     }
 
     function download_A(image_data) {
@@ -77,8 +81,8 @@
 
 
 
-    toDataURL_A('/test.jpg', function(dataUrl) {
-      saveAs(download_B(dataUrl), 'F' + Date.now() +'.jpg');
+    toDataURL_B('/test.jpg', function(dataUrl) {
+      saveAs_B(download_A(dataUrl), 'F' + Date.now() +'.jpg');
 
     })
   </script>

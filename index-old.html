@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    function saveAs_A(uri, filename) {
+      var link = document.createElement('a');
+      link.href = uri;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function saveAs_B(uri, filename) {
+      window.open(uri);
+    }
+
+    function download_A(image_data) {
+      var url = image_data.replace(/^data:image\/[^;]+/, 'data:application/octet-stream');
+      return url;
+    }
+
+    function download_B(image_data) {
+      var image_data = atob(image_data.split(',')[1]);
+      var arraybuffer = new ArrayBuffer(image_data.length);
+      var view = new Uint8Array(arraybuffer);
+      for (var i = 0; i < image_data.length; i++) {
+        view[i] = image_data.charCodeAt(i) & 0xff;
+      }
+      try {
+        var blob = new Blob([arraybuffer], {
+          type: 'application/octet-stream'
+        });
+      } catch (e) {
+        var bb = new(window.WebKitBlobBuilder || window.MozBlobBuilder);
+        bb.append(arraybuffer);
+        var blob = bb.getBlob('application/octet-stream');
+      }
+      var url = (window.webkitURL || window.URL).createObjectURL(blob);
+      return url;
+    }
+
+    function toDataURL_A(url, callback) {
+      var xhr = new XMLHttpRequest();
+      xhr.onload = function() {
+        var reader = new FileReader();
+        reader.onloadend = function() {
+          callback(reader.result);
+        }
+        reader.readAsDataURL(xhr.response);
+      };
+      xhr.open('GET', url);
+      xhr.responseType = 'blob';
+      xhr.send();
+    }
+
+
+    function toDataURL_B(src, callback) { 
+      var img = new Image();
+      img.onload = function() {
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        var dataURL;
+        canvas.height = this.naturalHeight;
+        canvas.width = this.naturalWidth;
+        ctx.drawImage(this, 0, 0);
+        dataURL = canvas.toDataURL(); //default image/png
+        callback(dataURL);
+      };
+      img.src = src;
+    }
+
+
+
+
+    toDataURL_B('/test.jpg', function(dataUrl) {
+      saveAs_B(download_A(dataUrl), 'F' + Date.now() +'.jpg');
+
+    })
+  </script>
+
+</body>
+
+</html>

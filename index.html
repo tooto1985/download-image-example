@@ -1,44 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
 </head>
-
 <body>
-    <img src="test.jpg">
+    <div style="background-image: url(test.jpg);width:800px;height: 452px;"></div>
     <br>
     <a href="test.jpg">下載圖片(X)</a>
     <br>
-    <a href="index.html">下載網頁(X)</a>
+    <a href="demo.html">下載網頁(X)</a>
     <br>
-    <a href="test.jpg" onclick="downloadHref(event,this)">下載圖片(O)</a>
+    <a class="download" href="test.jpg">下載圖片</a>
     <br>
-    <a href="index.html" onclick="downloadHref(event,this)">下載網頁(O)</a>
+    <a class="download" href="demo.html">下載網頁</a>
+
+    <!--
+    <form action="http://www.google.com.tw">
+        <input type="submit" value="SUBMIT">
+    </form>
+    -->
+
     <script>
-        function downloadHref(e, el) {
-            e.preventDefault();
-            getFile(el.href, function (arraybuffer) {
-                saveFile(modifyType(arraybuffer), el.pathname.substr(1));
-            });
-        }
+        [].slice.call(document.querySelectorAll(".download")).forEach(function(dom) {
+            dom.addEventListener("click", function(e) {
+                e.preventDefault();
+                getFile(this.href, function(data) {
+                    saveFile(modifyContentType(data), this.pathname.substr(1));
+                }.bind(this))
+            }, false);
+
+        })
+        
+        
+        
 
         function getFile(url, callback) {
             var xhr = new XMLHttpRequest();
-            xhr.onload = function () {
+            xhr.open("GET", url);
+            xhr.onload = function() {
                 callback(xhr.response);
-            };
-            xhr.open('GET', url);
-            xhr.responseType = 'arraybuffer';
+            }
+            xhr.responseType = "arraybuffer";
             xhr.send();
         }
 
-        function modifyType(arraybuffer) {
+        function modifyContentType(arraybuffer) {
             var blob = new Blob([arraybuffer], {
-                type: 'application/octet-stream'
+                type: "application/octet-stream"
             });
             return blob;
         }
@@ -47,7 +58,7 @@
             if (window.navigator.msSaveOrOpenBlob) {
                 window.navigator.msSaveOrOpenBlob(blob, filename);
             } else {
-                var link = document.createElement('a');
+                var link = document.createElement("a");
                 link.href = window.URL.createObjectURL(blob);
                 link.download = filename;
                 document.body.appendChild(link);
@@ -55,7 +66,15 @@
                 document.body.removeChild(link);
             }
         }
-    </script>
-</body>
 
+
+
+
+        /*
+
+        */
+    
+    </script>
+
+</body>
 </html>
